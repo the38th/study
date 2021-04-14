@@ -14,19 +14,18 @@ module Exercise
       def film_multicountry?(film)
         return false if film['country'].nil?
 
-        film['country'].include?(',')
+        film['country'].split(',').size >= 2
       end
 
       def rating(array)
-        multicountry_rated_films = []
-        array.map { |film| multicountry_rated_films << film if film_rated?(film) && film_multicountry?(film) }
+        multicountry_rated_films = array.select { |film| film_rated?(film) && film_multicountry?(film) }
         multicountry_rated_films.reduce(0) { |sum, film| sum + film['rating_kinopoisk'].to_f } / multicountry_rated_films.size
       end
 
-      def raiting_of_film(film)
-        return 0 if film['rating_kinopoisk'].nil?
+      def film_rated_enough?(film, threshold)
+        return false if film['rating_kinopoisk'].nil?
 
-        film['rating_kinopoisk'].to_f
+        film['rating_kinopoisk'].to_f > threshold
       end
 
       def count_of_i_letter(film_name)
@@ -36,8 +35,7 @@ module Exercise
       end
 
       def chars_count(films, threshold)
-        top_rated_films = []
-        films.map { |film| top_rated_films << film if raiting_of_film(film) > threshold }
+        top_rated_films = films.select { |film| film_rated_enough?(film, threshold) }
         top_rated_films.reduce(0) { |sum, film| sum + count_of_i_letter(film['name']) }
       end
     end
